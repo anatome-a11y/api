@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://doc-marcia:1qa2ws3ed@ds235239.mlab.com:35239/doc_marcia')
+mongoose.connect('mongodb://doc-marcia:1qa2ws3ed@ds121382.mlab.com:21382/doc_marcia')
 .then(() => {
     console.log("Conexão realizada com sucesso!");    
 }).catch(err => {
@@ -23,10 +23,6 @@ mongoose.connect('mongodb://doc-marcia:1qa2ws3ed@ds235239.mlab.com:35239/doc_mar
 const Peca = require('./peca');
 
 //API
-
-
-const isValid = val => val != undefined && val != null && (typeof val === 'string' && val.trim() != "")
-
 
 app.get('/peca', (req, res) => {
     Peca.find({}, (err, pessoas) => {
