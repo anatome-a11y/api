@@ -21,16 +21,20 @@ mongoose.connect('mongodb://doc-marcia:1qa2ws3ed@ds121382.mlab.com:21382/doc_mar
 });
 
 const Peca = require('./peca');
+const Roteiro = require('./roteiro');
+const Anatomp = require('./anatomp');
 
 //API
 
+//PEÇA
 app.get('/peca', (req, res) => {
-    Peca.find({}, (err, pessoas) => {
+    Peca.find({}, (err, pecas) => {
         if (err) return res.status(500).send({status: 500});
 
-        return res.status(200).send({pessoas});
+        return res.status(200).send({data: pecas});
     });  
 });
+
 
 
 app.post('/peca', (req, res) => {
@@ -42,6 +46,25 @@ app.post('/peca', (req, res) => {
     }); 
 });
 
+
+//ROTEIRO
+app.get('/roteiro', (req, res) => {
+    Roteiro.find({}, (err, roteiros) => {
+        if (err) return res.status(500).send({status: 500});
+
+        return res.status(200).send({data: roteiros});
+    });  
+});
+
+
+//AN@TOMP
+app.get('/anatomp', (req, res) => {
+    Anatomp.find({}, (err, anatomps) => {
+        if (err) return res.status(500).send({status: 500});
+
+        return res.status(200).send({data: anatomps});
+    });  
+});
 
 app.listen(process.env.PORT || 8080, () => {
     console.log("Ouvindo na porta 8080");
