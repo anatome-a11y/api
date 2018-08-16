@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://cartao-todos:1qa2ws3ed@ds235239.mlab.com:35239/cartao_de_todos')
+mongoose.connect('mongodb://doc-marcia:1qa2ws3ed@ds235239.mlab.com:35239/doc_marcia')
 .then(() => {
     console.log("Conexão realizada com sucesso!");    
 }).catch(err => {
@@ -29,7 +29,7 @@ const isValid = val => val != undefined && val != null && (typeof val === 'strin
 
 
 app.get('/peca', (req, res) => {
-    Pessoa.find({}, (err, pessoas) => {
+    Peca.find({}, (err, pessoas) => {
         if (err) return res.status(500).send({status: 500});
 
         return res.status(200).send({pessoas});
@@ -37,19 +37,13 @@ app.get('/peca', (req, res) => {
 });
 
 
-app.post('/pessoas', (req, res) => {
+app.post('/peca', (req, res) => {
+    const peca = new Peca(req.body)
+    peca.save((err, _peca) => {
+        if (err) return res.status(500).send({status: 500});
 
-    if(req.body.hasOwnProperty('pessoas') && Array.isArray(req.body.pessoas)){
-        req.body.pessoas.every(r => {
-            Pessoa.collection.insert(req.body.pessoas, err => {
-                if (err) return res.status(500).send({status: 500});
-        
-                return res.status(200).send({status: 200});
-            }); 
-        })
-    }else{
-        return res.status(400).send({status: 400, body: req.body});
-    }
+        return res.status(200).send({_peca});
+    }); 
 });
 
 
