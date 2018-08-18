@@ -49,7 +49,7 @@ app.post('/peca', (req, res) => {
     peca.save((err, _peca) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({_peca});
+        return res.status(200).send({_peca, body: req.body});
     }); 
 });
 
