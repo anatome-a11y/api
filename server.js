@@ -46,8 +46,8 @@ app.get('/peca', (req, res) => {
 
 app.post('/peca', (req, res) => {
     const peca = new Peca(req.body)
-    peca.save((error, _peca) => {
-        if (err) return res.status(500).send({status: 500, error});
+    peca.save((err, _peca) => {
+        if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({_peca});
     }); 
