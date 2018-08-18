@@ -6,7 +6,7 @@ var esquemaMidia = new Schema({
     name: String,
     tags: [{type: String}],
     type: String,
-}, { _id : false });
+});
 
 var esquemaConteudoTeorico = new Schema({
     id: String,
@@ -14,12 +14,12 @@ var esquemaConteudoTeorico = new Schema({
     midias: [esquemaMidia],
     plural: String,
     singular: String
-}, { _id : false });
+});
 
 var esquemaParte = new Schema({
     id: String,
     nome: String
-}, { _id : false });
+});
 
 var esquemaPeca = new Schema({
     id: String,
@@ -29,7 +29,7 @@ var esquemaPeca = new Schema({
     regiao: String,
     partes: [esquemaParte],
     conteudoTeorico: [esquemaConteudoTeorico]
-}, { _id : false });
+});
 
 var Peca = mongoose.model('Peca', esquemaPeca);   
 

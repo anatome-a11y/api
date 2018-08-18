@@ -36,7 +36,7 @@ app.use(function(req, res, next) {
 //PEÇA
 app.get('/peca', (req, res) => {
     Peca.find({}, (err, pecas) => {
-        if (err) return res.status(500).send({status: 500});
+        if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({data: pecas});
     });  
@@ -57,7 +57,7 @@ app.post('/peca', (req, res) => {
 //ROTEIRO
 app.get('/roteiro', (req, res) => {
     Roteiro.find({}, (err, roteiros) => {
-        if (err) return res.status(500).send({status: 500});
+        if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({data: roteiros});
     });  
@@ -67,7 +67,7 @@ app.get('/roteiro', (req, res) => {
 //AN@TOMP
 app.get('/anatomp', (req, res) => {
     Anatomp.find({}, (err, anatomps) => {
-        if (err) return res.status(500).send({status: 500});
+        if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({data: anatomps});
     });  

@@ -9,7 +9,7 @@ var esquemaRoteiro = new Schema({
     proposito: String, 
     partes: [{type: String}],
     conteudos: [{type: String}]  
-}, { _id : false });
+});
 
 var Roteiro = mongoose.model('Roteiro', esquemaRoteiro);   
 
