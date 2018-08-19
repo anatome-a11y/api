@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
 //BANCO DE DADOS
 const mongoose = require('mongoose');
 
@@ -29,9 +32,6 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
-
 
 //PEÇA
 app.get('/peca', (req, res) => {
@@ -51,6 +51,28 @@ app.post('/peca', (req, res) => {
 
         return res.status(200).send({_peca, body: req.body});
     }); 
+});
+
+
+
+
+app.delete('/peca/:_id', (req, res) => {
+    Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        return res.status(200).send({_peca, body: req.body});
+    })
+});
+
+
+
+app.put('/peca/:_id', (req, res) => {
+    const peca = new Peca(req.body)
+    Peca.findByIdAndUpdate(req.params._id, peca, (err, _peca) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        return res.status(200).send({_peca, body: req.body});
+    })
 });
 
 
