@@ -7,8 +7,8 @@ var esquemaRoteiro = new Schema({
     curso: String,
     disciplina: String,
     proposito: String, 
-    partes: [{type: String}],
-    conteudos: [{type: String}]  
+    partes: [{ type : Schema.Types.ObjectId, ref: 'Parte' }],
+    conteudos: [{ type : Schema.Types.ObjectId, ref: 'ConteudoTeorico' }]  
 });
 
 var Roteiro = mongoose.model('Roteiro', esquemaRoteiro);   
