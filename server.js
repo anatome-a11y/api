@@ -89,6 +89,34 @@ app.get('/roteiro', (req, res) => {
     });  
 });
 
+app.post('/roteiro', (req, res) => {
+    const roteiro = new Roteiro(req.body)
+    roteiro.save((err, _roteiro) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        return res.status(200).send({status: 200, data: _roteiro});
+    }); 
+});
+
+app.delete('/roteiro/:_id', (req, res) => {
+    Roteiro.findByIdAndRemove(req.params._id, (err, _roteiro) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        return res.status(200).send({status: 200, data: _roteiro});
+    })
+});
+
+
+
+app.put('/roteiro/:_id', (req, res) => {
+    const roteiro = new Roteiro(req.body)
+    Roteiro.findByIdAndUpdate(req.params._id, roteiro, (err, _roteiro) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        return res.status(200).send({status: 200, data: _roteiro});
+    })
+});
+
 
 //AN@TOMP
 app.get('/anatomp', (req, res) => {
