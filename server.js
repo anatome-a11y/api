@@ -26,6 +26,9 @@ const Anatomp = require('./anatomp');
 
 //API
 
+//Tentativa de evitar 304
+app.disable('etag');
+
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
     res.header("Access-Control-Allow-Origin", "*");
