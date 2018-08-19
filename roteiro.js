@@ -7,7 +7,7 @@ var esquemaRoteiro = new Schema({
     curso: String,
     disciplina: String,
     proposito: String, 
-    partes: [{ type : Schema.Types.ObjectId, ref: 'Parte' }],
+    partes: [{ type : String }],
     conteudos: [{ type : Schema.Types.ObjectId, ref: 'ConteudoTeorico' }]  
 });
 
