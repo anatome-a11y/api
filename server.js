@@ -38,7 +38,7 @@ app.get('/peca', (req, res) => {
     Peca.find({}, (err, pecas) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({data: pecas});
+        return res.status(200).send({status: 200, data: pecas});
     });  
 });
 
@@ -49,7 +49,7 @@ app.post('/peca', (req, res) => {
     peca.save((err, _peca) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({_peca, body: req.body});
+        return res.status(200).send({status: 200, data: _peca});
     }); 
 });
 
@@ -60,7 +60,7 @@ app.delete('/peca/:_id', (req, res) => {
     Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({_peca, body: req.body});
+        return res.status(200).send({status: 200, data: _peca});
     })
 });
 
@@ -71,7 +71,7 @@ app.put('/peca/:_id', (req, res) => {
     Peca.findByIdAndUpdate(req.params._id, peca, (err, _peca) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({_peca, body: req.body});
+        return res.status(200).send({status: 200, data: _peca});
     })
 });
 
@@ -81,7 +81,7 @@ app.get('/roteiro', (req, res) => {
     Roteiro.find({}, (err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({data: roteiros});
+        return res.status(200).send({status: 200, data: roteiros});
     });  
 });
 
@@ -91,7 +91,7 @@ app.get('/anatomp', (req, res) => {
     Anatomp.find({}, (err, anatomps) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({data: anatomps});
+        return res.status(200).send({status: 200, data: anatomps});
     });  
 });
 
