@@ -4,9 +4,6 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
-
 //BANCO DE DADOS
 const mongoose = require('mongoose');
 
@@ -27,11 +24,13 @@ const Anatomp = require('./anatomp');
 //API
 
 app.use(function(req, res, next) {
-    console.log(req.body)
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 
 
 //PEÇA
