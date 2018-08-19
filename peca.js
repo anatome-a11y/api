@@ -6,6 +6,8 @@ var esquemaMidia = new Schema({
     name: String,
     tags: [{type: String}],
     type: String,
+    handle: String,
+    url: String
 });
 
 var esquemaConteudoTeorico = new Schema({
