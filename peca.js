@@ -35,7 +35,7 @@ var esquemaPeca = new Schema({
 
 // mongoose.model('Midia', esquemaMidia);   
 mongoose.model('ConteudoTeorico', esquemaConteudoTeorico);   
-// mongoose.model('Parte', esquemaParte);   
+mongoose.model('Parte', esquemaParte);   
 var Peca = mongoose.model('Peca', esquemaPeca);   
 
 module.exports = Peca;

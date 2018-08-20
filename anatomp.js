@@ -14,9 +14,10 @@ var esquemaLocalizacao = new Schema({
 
 var esquemaMap = new Schema({
     id: String,
-    parte: String,
+    parte: {type : Schema.Types.ObjectId, ref: 'Parte'},
     numero: Number,
-    localizacao: esquemaLocalizacao
+    localizacao: esquemaLocalizacao,
+    pecasFisicas:[{type: String}]
 });
 
 var esquemaPecaFisica = new Schema({
@@ -26,7 +27,6 @@ var esquemaPecaFisica = new Schema({
 });
 
 var esquemaAnatomp = new Schema({
-    id: String,
     nome: String,
     instituicao: String,
     roteiro: { type : Schema.Types.ObjectId, ref: 'Roteiro' },

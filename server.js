@@ -86,7 +86,7 @@ app.get('/roteiro', (req, res) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({status: 200, data: roteiros});
-    });  
+    }).populate('conteudos');  
 });
 
 app.post('/roteiro', (req, res) => {
