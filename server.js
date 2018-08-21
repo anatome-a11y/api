@@ -82,7 +82,7 @@ app.put('/peca/:_id', (req, res) => {
 
 //ROTEIRO
 app.get('/roteiro', (req, res) => {
-    Roteiro.find({}).populate('conteudos').exec((err, roteiros) => {
+    Roteiro.find({}).populate({path: 'conteudos', model: 'ConteudoTeorico'}).exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({status: 200, data: roteiros});
