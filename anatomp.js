@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var esquemaLocalizacao = new Schema({
+    pecaFisica: {type : Schema.Types.ObjectId, ref: 'PecaFisica'},
     anterior: String,
     posterior: String,
     latDir: String,
@@ -16,7 +17,7 @@ var esquemaMap = new Schema({
     id: String,
     parte: {type : Schema.Types.ObjectId, ref: 'Parte'},
     numero: Number,
-    localizacao: esquemaLocalizacao,
+    localizacao: [esquemaLocalizacao],
     pecasFisicas:[{type: String}]
 });
 
