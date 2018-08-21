@@ -82,10 +82,27 @@ app.put('/peca/:_id', (req, res) => {
 
 //ROTEIRO
 app.get('/roteiro', (req, res) => {
-    Roteiro.find({}).populate({path: 'conteudos', model: 'ConteudoTeorico'}).exec((err, roteiros) => {
+    Roteiro.find({}).exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({status: 200, data: roteiros});
+    });  
+});
+
+app.get('/roteiro/:_id/partes', (req, res) => {
+    Roteiro.findById(req.params._id).exec((err, roteiro) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        Peca.find({}, (err, pecas) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+
+            const partes = pecas.map(p => p.partes);
+            const flat = [].concat.apply([], partes)
+
+            const _partes = flat.filter(f => roteiro.partes.indexOf(f._id) != -1);
+    
+            return res.status(200).send({status: 200, data: _partes});
+        });
     });  
 });
 
