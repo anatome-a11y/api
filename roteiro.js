@@ -2,14 +2,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var esquemaRoteiro = new Schema({
-    id: String,
+    _id: String,
     nome: String,
     curso: String,
     disciplina: String,
     proposito: String, 
     partes: [{ type : String }],
     conteudos: [{ type : Schema.Types.ObjectId, ref: 'ConteudoTeorico' }]  
-});
+}, {_id: false});
 
 var Roteiro = mongoose.model('Roteiro', esquemaRoteiro);   
 
