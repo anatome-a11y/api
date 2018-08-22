@@ -99,7 +99,7 @@ app.get('/roteiro/:_id/partes', (req, res) => {
             const partes = pecas.map(p => p.partes);
             const flat = [].concat.apply([], partes)
 
-            const _partes = flat.filter(f => roteiro.partes.indexOf(f.id) != -1);
+            const _partes = flat.filter(f => roteiro.partes.indexOf(f._id) != -1);
     
             return res.status(200).send({status: 200, data: _partes});
         });
