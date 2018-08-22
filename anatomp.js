@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var esquemaLocalizacao = new Schema({
     _id: String,
-    pecaFisica: {type : Schema.Types.ObjectId, ref: 'PecaFisica'},
+    pecaFisica: {type : String, ref: 'PecaFisica'},
     anterior: String,
     posterior: String,
     latDir: String,
@@ -16,7 +16,7 @@ var esquemaLocalizacao = new Schema({
 
 var esquemaMap = new Schema({
     _id: String,
-    parte: {type : Schema.Types.ObjectId, ref: 'Parte'},
+    parte: {type : String, ref: 'Parte'},
     numero: Number,
     localizacao: [esquemaLocalizacao],
     pecasFisicas:[{type: String}]
@@ -32,7 +32,7 @@ var esquemaAnatomp = new Schema({
     _id: String,
     nome: String,
     instituicao: String,
-    roteiro: { type : Schema.Types.ObjectId, ref: 'Roteiro' },
+    roteiro: { type : String, ref: 'Roteiro' },
     pecasFisicas: [esquemaPecaFisica],
     mapa: [esquemaMap]
 }, {_id: false});
