@@ -25,6 +25,7 @@ const Roteiro = require('./models/roteiro');
 const Anatomp = require('./models/anatomp');
 const Parte = require('./models/parte');
 const ConteudoTeorico = require('./models/conteudoTeorico');
+const PecaFisica = require('./models/pecaFisica');
 
 //API
 
@@ -125,22 +126,6 @@ app.get('/roteiro', (req, res) => {
     });  
 });
 
-app.get('/roteiro/:_id/partes', (req, res) => {
-    Roteiro.findById(req.params._id).exec((err, roteiro) => {
-        if (err) return res.status(500).send({status: 500, error: err});
-
-        Peca.find({}, (err, pecas) => {
-            if (err) return res.status(500).send({status: 500, error: err});
-
-            const partes = pecas.map(p => p.partes);
-            const flat = [].concat.apply([], partes)
-
-            const _partes = flat.filter(f => roteiro.partes.indexOf(f._id) != -1);
-    
-            return res.status(200).send({status: 200, data: _partes});
-        });
-    });  
-});
 
 app.post('/roteiro', (req, res) => {
     const roteiro = new Roteiro(req.body)
@@ -178,6 +163,34 @@ app.get('/anatomp', (req, res) => {
 
         return res.status(200).send({status: 200, data: anatomps});
     });  
+});
+
+app.post('/peca', (req, res) => {
+    var peca = req.body;
+    var partes = req.body.partes.map(c => new Parte(c));
+    var conteudo = req.body.conteudoTeorico.map(c => new ConteudoTeorico(c));
+
+    //Salva as partes das peças
+    Parte.collection.insert(partes, (err, partes) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        peca.partes = peca.partes.map(c => c._id)
+
+        //Salva os conteúdos teóricos
+        ConteudoTeorico.collection.insert(conteudo, (err, conteudos) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+    
+            peca.conteudoTeorico = peca.conteudoTeorico.map(c => c._id)
+    
+            const toSave = new Peca(peca)        
+    
+            toSave.save((err, _peca) => {
+                if (err) return res.status(500).send({status: 500, error: err});
+        
+                return res.status(200).send({status: 200, data: _peca});
+            }); 
+        });
+    });
 });
 
 app.listen(process.env.PORT || 8080, () => {
