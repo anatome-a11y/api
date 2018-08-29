@@ -41,7 +41,7 @@ app.use(function(req, res, next) {
 
 //PEÇA
 app.get('/peca', (req, res) => {
-    Peca.find({}).populate({ path: 'conteudoTeorico', populate: { path: 'partes'} }).exec((err, pecas) => {
+    Peca.find({}).populate({ path: 'conteudoTeorico', populate: { path: 'partes'} }).populate({path: 'partes'}).exec((err, pecas) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({status: 200, data: pecas});
