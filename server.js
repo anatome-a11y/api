@@ -106,10 +106,8 @@ app.get('/roteiro', (req, res) => {
             const uniqueMidia = flat.filter(function(item, pos) {
                 return flat.indexOf(item) == pos;
             });
-
-            r.tiposMidia = uniqueMidia;
             
-            return r;
+            return {...r, uniqueMidia};
         });
         
 
