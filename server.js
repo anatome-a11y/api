@@ -57,13 +57,13 @@ app.post('/peca', (req, res) => {
 
     //Salva as partes das peças
     Parte.collection.insert(partes, (err, partes) => {
-        if (err) return res.status(500).send({status: 500});
+        if (err) return res.status(500).send({status: 500, error: err});
 
         peca.partes = peca.partes.map(c => c._id)
 
         //Salva os conteúdos teóricos
         ConteudoTeorico.collection.insert(conteudo, (err, conteudos) => {
-            if (err) return res.status(500).send({status: 500});
+            if (err) return res.status(500).send({status: 500, error: err});
     
             peca.conteudoTeorico = peca.conteudoTeorico.map(c => c._id)
     
