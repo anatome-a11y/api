@@ -96,6 +96,8 @@ app.get('/roteiro', (req, res) => {
     Roteiro.find({}).populate({ path: 'conteudos' }).exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
+        console.log(roteiros)
+
         const _roteiros = roteiros.map(r => {
             const tiposMidia = r.midias.map(m => m.type);
 
