@@ -159,7 +159,7 @@ app.put('/roteiro/:_id', (req, res) => {
 //AN@TOMP
 app.get('/anatomp', (req, res) => {
     Anatomp.find({})
-    .populate({path: 'roteiro', populate: [{path: 'conteudos'}, {path: 'partes'}]})
+    .populate({path: 'roteiro', populate: [{path: 'conteudos', populate: {path: 'partes'}}, {path: 'partes'}]})
     .populate({path: 'pecasFisicas'})    
     .populate({ path: 'mapa.parte' })
     .populate({ path: 'mapa.localizacao.pecaFisica' })
