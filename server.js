@@ -103,7 +103,7 @@ app.put('/peca/:_id', (req, res) => {
 
 //ROTEIRO
 app.get('/roteiro', (req, res) => {
-    Roteiro.find({}).populate({ path: 'conteudos' }).lean().exec((err, roteiros) => {
+    Roteiro.find({}).populate({ path: 'conteudos', populate: {path: 'partes'} }).populate({path: 'partes'}).lean().exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         const _roteiros = roteiros.map(r => {
