@@ -23,6 +23,7 @@ mongoose.connect('mongodb://doc-marcia:1qa2ws3ed@ds121382.mlab.com:21382/doc_mar
 const Peca = require('./peca');
 const Roteiro = require('./roteiro');
 const Anatomp = require('./anatomp');
+const ConteudoTeorico = require('./conteudoTeorico');
 
 //API
 
@@ -49,12 +50,22 @@ app.get('/peca', (req, res) => {
 
 
 app.post('/peca', (req, res) => {
-    const peca = new Peca(req.body)
-    peca.save((err, _peca) => {
-        if (err) return res.status(500).send({status: 500, error: err});
+    var peca = req.body;
+    var conteudo = req.body.conteudoTeorico.map(c => new ConteudoTeorico(c));
 
-        return res.status(200).send({status: 200, data: _peca});
-    }); 
+    ConteudoTeorico.collection.insert(conteudo, (err, conteudos) => {
+        if (err) return res.status(500).send({status: 500});
+
+        peca.conteudoTeorico = peca.conteudoTeorico.map(c => c._id)
+
+        const toSave = new Peca(peca)        
+
+        toSave.save((err, _peca) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+    
+            return res.status(200).send({status: 200, data: _peca});
+        }); 
+    });
 });
 
 
@@ -85,8 +96,21 @@ app.get('/roteiro', (req, res) => {
     Roteiro.find({}).exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({status: 200, data: roteiros});
-    });  
+        const _roteiros = roteiros.map(r => {
+            const tiposMidia = r.midias.map(m => m.type);
+
+            const uniqueMidia = tiposMidia.filter(function(item, pos) {
+                return tiposMidia.indexOf(item) == pos;
+            });
+
+            r.tiposMidia = uniqueMidia;
+            
+            return r;
+        });
+        
+
+        return res.status(200).send({status: 200, data: _roteiros});
+    }).populate({ path: 'conteudos' });  
 });
 
 app.get('/roteiro/:_id/partes', (req, res) => {
