@@ -96,12 +96,11 @@ app.get('/roteiro', (req, res) => {
     Roteiro.find({}).populate({ path: 'conteudos' }).exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        console.log('-------------------');
-        console.log(roteiros);
-        console.log('-------------------');
-
         const _roteiros = roteiros.map(r => {
-            const tiposMidia = r.conteudos.midias.map(m => m.type);
+            const tiposMidia = r.conteudos.map(c => {
+                const arr = c.midias.map(m => m.type);
+                return [].concat.apply([], arr)
+            });
             const flat = [].concat.apply([], tiposMidia)
 
             const uniqueMidia = flat.filter(function(item, pos) {
