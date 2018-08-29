@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var esquemaLocalizacao = new Schema({
+var esquemaReferenciaRelativa = new Schema({
     anterior: String,
     posterior: String,
     latDir: String,
