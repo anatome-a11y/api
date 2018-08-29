@@ -12,7 +12,7 @@ var esquemaMidia = new Schema({
 
 var esquemaConteudoTeorico = new Schema({
     _id: String,
-    partes: [{type: String}],
+    partes: [[{ type: String, ref: 'Parte' }]],
     midias: [esquemaMidia],
     plural: String,
     singular: String
