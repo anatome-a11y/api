@@ -165,32 +165,23 @@ app.get('/anatomp', (req, res) => {
     });  
 });
 
-app.post('/peca', (req, res) => {
-    var peca = req.body;
-    var partes = req.body.partes.map(c => new Parte(c));
-    var conteudo = req.body.conteudoTeorico.map(c => new ConteudoTeorico(c));
+app.post('/anatomp', (req, res) => {
+    var anatomp = req.body;
+    var pecasFisicas = req.body.pecasFisicas.map(c => new PecaFisica(c));
 
-    //Salva as partes das peças
-    Parte.collection.insert(partes, (err, partes) => {
+    PecaFisica.collection.insert(pecasFisicas, (err, pecasFisicas) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        peca.partes = peca.partes.map(c => c._id)
+        anatomp.pecasFisicas = anatomp.pecasFisicas.map(c => c._id)
 
-        //Salva os conteúdos teóricos
-        ConteudoTeorico.collection.insert(conteudo, (err, conteudos) => {
+        const toSave = new Anatomp(anatomp)        
+
+        toSave.save((err, _anatomp) => {
             if (err) return res.status(500).send({status: 500, error: err});
     
-            peca.conteudoTeorico = peca.conteudoTeorico.map(c => c._id)
-    
-            const toSave = new Peca(peca)        
-    
-            toSave.save((err, _peca) => {
-                if (err) return res.status(500).send({status: 500, error: err});
-        
-                return res.status(200).send({status: 200, data: _peca});
-            }); 
-        });
-    });
+            return res.status(200).send({status: 200, data: _anatomp});
+        }); 
+    });    
 });
 
 app.listen(process.env.PORT || 8080, () => {
