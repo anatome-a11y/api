@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var esquemaReferenciaRelativa = new Schema({
+    _id: String,
     anterior: String,
     posterior: String,
     latDir: String,

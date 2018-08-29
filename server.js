@@ -158,7 +158,7 @@ app.put('/roteiro/:_id', (req, res) => {
 
 //AN@TOMP
 app.get('/anatomp', (req, res) => {
-    Anatomp.find({}, (err, anatomps) => {
+    Anatomp.find({}).populate({ path: 'mapa.parte' }).populate({ path: 'mapa.localizacao.pecaFisica' }).populate({path: 'roteiro'}).populate({path: 'pecasFisicas'}).lean().exec((err, anatomps) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({status: 200, data: anatomps});
