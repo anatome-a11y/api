@@ -27,6 +27,21 @@ const Parte = require('./models/parte');
 const ConteudoTeorico = require('./models/conteudoTeorico');
 const PecaFisica = require('./models/pecaFisica');
 
+
+const withResumoMidias = r => {
+    const tiposMidia = r.conteudos.map(c => {
+        const arr = c.midias.map(m => m.type);
+        return [].concat.apply([], arr)
+    });
+    const flat = [].concat.apply([], tiposMidia)
+
+    const resumoMidias = flat.filter(function(item, pos) {
+        return flat.indexOf(item) == pos;
+    });
+    
+    return {...r, resumoMidias};
+}
+
 //API
 
 //Tentativa de evitar 304
@@ -107,19 +122,7 @@ app.get('/roteiro', (req, res) => {
     Roteiro.find({}).populate({ path: 'conteudos', populate: {path: 'partes'} }).populate({path: 'partes'}).lean().exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        const _roteiros = roteiros.map(r => {
-            const tiposMidia = r.conteudos.map(c => {
-                const arr = c.midias.map(m => m.type);
-                return [].concat.apply([], arr)
-            });
-            const flat = [].concat.apply([], tiposMidia)
-
-            const uniqueMidia = flat.filter(function(item, pos) {
-                return flat.indexOf(item) == pos;
-            });
-            
-            return {...r, uniqueMidia};
-        });
+        const _roteiros = roteiros.map(withResumoMidias);
         
 
         return res.status(200).send({status: 200, data: _roteiros});
@@ -167,7 +170,12 @@ app.get('/anatomp', (req, res) => {
     .exec((err, anatomps) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({status: 200, data: anatomps});
+        const _anatomps = anatomps.map(a => ({
+            ...a,
+            roteiro: withResumoMidias(a.roteiro)
+        }))
+
+        return res.status(200).send({status: 200, data: _anatomps});
     });  
 });
 
