@@ -98,12 +98,22 @@ app.post('/peca', (req, res) => {
 
 
 app.delete('/peca/:_id', (req, res) => {
-    Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
-        if (err) return res.status(500).send({status: 500, error: err});
+
+    Peca.findById(req.params._id, (err, peca) => {
+        Roteiro.find({}, (err, roteiros) => {
+            const achou = roteiros.find(r => r.partes.some(id => peca.partes.indexOf(id) >= 0));
+
+            return res.status(200).send({status: 200, data: achou});            
+        })         
+    })
+
+  
+    // Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
+    //     if (err) return res.status(500).send({status: 500, error: err});
         
 
-        return res.status(200).send({status: 200, data: _peca});
-    })
+    //     return res.status(200).send({status: 200, data: _peca});
+    // })
 });
 
 
