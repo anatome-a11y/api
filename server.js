@@ -101,19 +101,20 @@ app.delete('/peca/:_id', (req, res) => {
 
     Peca.findById(req.params._id, (err, peca) => {
         Roteiro.find({}, (err, roteiros) => {
-            const achou = roteiros.find(r => r.partes.some(id => peca.partes.indexOf(id) >= 0));
+            const achou = roteiros.filter(r => r.partes.some(id => peca.partes.indexOf(id) >= 0));
 
-            return res.status(200).send({status: 200, data: achou});            
+            if(achou.length > 0){
+                const nomes = achou.map(r => r.nome).join(', ');
+                return res.status(500).send({status: 500, error: 'Não é possível excluir a peça, pois a mesma possui partes utilizadas nos roteiros'+nomes+'.'}); 
+            }else{
+                Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
+                    if (err) return res.status(500).send({status: 500, error: err});
+                    
+                    return res.status(200).send({status: 200, data: _peca});
+                })
+            }           
         })         
     })
-
-  
-    // Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
-    //     if (err) return res.status(500).send({status: 500, error: err});
-        
-
-    //     return res.status(200).send({status: 200, data: _peca});
-    // })
 });
 
 
