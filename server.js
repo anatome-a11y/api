@@ -100,6 +100,7 @@ app.post('/peca', (req, res) => {
 app.delete('/peca/:_id', (req, res) => {
     Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
         if (err) return res.status(500).send({status: 500, error: err});
+        
 
         return res.status(200).send({status: 200, data: _peca});
     })
@@ -107,13 +108,33 @@ app.delete('/peca/:_id', (req, res) => {
 
 
 
-app.put('/peca/:_id', (req, res) => {
-    const peca = new Peca(req.body)
-    Peca.findByIdAndUpdate(req.params._id, peca, (err, _peca) => {
+app.put('/peca/:id', (req, res) => {
+    var peca = req.body;
+    var partes = req.body.partes;
+    var conteudo = req.body.conteudoTeorico;
+
+
+    partes.forEach(p => {
+        Parte.findByIdAndUpdate(p._id, p, {upsert: true}, (err, _parte) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+        })
+    })
+
+    conteudo.forEach(p => {
+        ConteudoTeorico.findByIdAndUpdate(p._id, p, {upsert: true}, (err, _conteudo) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+        })
+    })   
+    
+    peca.partes = partes.map(c => c._id)
+    peca.conteudoTeorico = conteudo.map(c => c._id)    
+
+    Peca.findByIdAndUpdate(peca._id, peca, (err, _peca) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         return res.status(200).send({status: 200, data: _peca});
     })
+
 });
 
 
