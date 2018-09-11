@@ -105,7 +105,7 @@ app.delete('/peca/:_id', (req, res) => {
 
             if(achou.length > 0){
                 const nomes = achou.map(r => r.nome).join(', ');
-                return res.status(500).send({status: 500, error: 'Não é possível excluir a peça, pois a mesma possui partes utilizadas nos roteiros'+nomes+'.'}); 
+                return res.status(500).send({status: 500, error: 'Não é possível excluir a peça, pois a mesma possui partes utilizadas nos roteiros '+nomes+'.'}); 
             }else{
                 Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
                     if (err) return res.status(500).send({status: 500, error: err});
@@ -172,10 +172,17 @@ app.post('/roteiro', (req, res) => {
 });
 
 app.delete('/roteiro/:_id', (req, res) => {
-    Roteiro.findByIdAndRemove(req.params._id, (err, _roteiro) => {
-        if (err) return res.status(500).send({status: 500, error: err});
-
-        return res.status(200).send({status: 200, data: _roteiro});
+    Anatomp.find({roteiro: req.params._id}, (err, anatomps) => {
+        if(anatomps.length > 0){
+            const nomes = anatomps.map(a => a.nome).join(', ');
+            return res.status(500).send({status: 500, error: 'Não é possível excluir o roteiro, pois o mesmo está vinculado às Anatoms '+nomes+'.'}); 
+        }else{
+            Roteiro.findByIdAndRemove(req.params._id, (err, _roteiro) => {
+                if (err) return res.status(500).send({status: 500, error: err});
+        
+                return res.status(200).send({status: 200, data: _roteiro});
+            })
+        }
     })
 });
 
