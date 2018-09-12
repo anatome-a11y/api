@@ -243,7 +243,7 @@ app.put('/anatomp/:id', (req, res) => {
 
 
     pecasFisicas.forEach(p => {
-        Parte.findByIdAndUpdate(p._id, p, {upsert: true}, (err, _parte) => {
+        PecaFisica.findByIdAndUpdate(p._id, p, {upsert: true}, (err, _pf) => {
             if (err) return res.status(500).send({status: 500, error: err});
         })
     })
