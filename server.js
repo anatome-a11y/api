@@ -145,7 +145,6 @@ app.put('/peca/:id', (req, res) => {
 
         return res.status(200).send({status: 200, data: _peca});
     })
-
 });
 
 
@@ -236,6 +235,40 @@ app.post('/anatomp', (req, res) => {
         }); 
     });    
 });
+
+
+app.put('/anatomp/:id', (req, res) => {
+    var anatomp = req.body;
+    var pecasFisicas = req.body.pecasFisicas;
+
+
+    pecasFisicas.forEach(p => {
+        Parte.findByIdAndUpdate(p._id, p, {upsert: true}, (err, _parte) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+        })
+    })
+    
+    anatomp.pecasFisicas = pecasFisicas.map(c => c._id)
+
+    Anatomp.findByIdAndUpdate(anatomp._id, anatomp, (err, _peca) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        return res.status(200).send({status: 200, data: _peca});
+    })
+});
+
+
+
+app.delete('/anatomp/:_id', (req, res) => {
+    Anatomp.findByIdAndRemove(req.params._id, (err, _anatomp) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        return res.status(200).send({status: 200, data: _anatomp});
+    })
+});
+
+
+
 
 app.listen(process.env.PORT || 8080, () => {
     console.log("Ouvindo na porta 8080");
