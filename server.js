@@ -172,10 +172,9 @@ app.post('/roteiro', (req, res) => {
 
 app.delete('/roteiro/:_id', (req, res) => {
     Anatomp.find({roteiro: req.params._id}, (err, anatomps) => {
-        console.log(anatomps)
         if(anatomps.length > 0){
             const nomes = anatomps.map(a => a.nome).join(', ');
-            return res.status(500).send({status: 500, error: 'Não é possível excluir o roteiro, pois o mesmo está vinculado às Anatoms '+nomes+'.'}); 
+            return res.status(401).send({status: 401, error: 'Não é possível excluir o roteiro, pois o mesmo está vinculado às Anatoms '+nomes+'.'}); 
         }else{
             Roteiro.findByIdAndRemove(req.params._id, (err, _roteiro) => {
                 if (err) return res.status(500).send({status: 500, error: err});

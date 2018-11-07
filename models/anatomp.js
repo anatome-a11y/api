@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var esquemaGeneralidade = require('../schemas/generalidade')
+
 var esquemaReferenciaRelativa = new Schema({
     _id: String,
     anterior: String,
@@ -32,7 +34,8 @@ var esquemaAnatomp = new Schema({
     roteiro: { type : String, ref: 'Roteiro' },    
     instituicao: String,
     pecasFisicas: [{type: String, ref: 'PecaFisica'}],
-    mapa: [esquemaMap]
+    mapa: [esquemaMap],
+    generalidades: [esquemaGeneralidade]
 }, {_id: false});
 
 var Anatomp = mongoose.model('Anatomp', esquemaAnatomp);   
