@@ -6,8 +6,8 @@ var esquemaGeneralidade = require('../schemas/generalidade')
 var esquemaPeca = new Schema({
     _id: String,
     nome: String,
-    sistema: {_id: String, name: String},
-    regiao: {_id: String, name: String},
+    sistema: String,
+    regiao: String,
     partes: [{ type: String, ref: 'Parte' }],
     conteudoTeorico: [{ type: String, ref: 'ConteudoTeorico' }],
     generalidades: [esquemaGeneralidade]

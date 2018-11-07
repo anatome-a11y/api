@@ -5,7 +5,7 @@ var esquemaGeneralidade = require('../schemas/generalidade')
 
 var esquemaRoteiro = new Schema({
     _id: String,
-    idioma: {_id: String, name: String},
+    idioma: String,
     nome: String,
     curso: String,
     disciplina: String,
