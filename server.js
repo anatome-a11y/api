@@ -109,8 +109,16 @@ app.delete('/peca/:_id', (req, res) => {
             }else{
                 Peca.findByIdAndRemove(req.params._id, (err, _peca) => {
                     if (err) return res.status(500).send({status: 500, error: err});
-                    
-                    return res.status(200).send({status: 200, data: _peca});
+
+                    Parte.remove({_id: {$in: _peca.partes}}, err => {
+                        if (err) return res.status(500).send({status: 500, error: err});
+
+                        ConteudoTeorico.remove({_id: {$in: _peca.conteudoTeorico}}, err => {
+                            if (err) return res.status(500).send({status: 500, error: err});
+
+                            return res.status(200).send({status: 200, data: _peca});
+                        })                        
+                    })   
                 })
             }           
         })         
@@ -263,7 +271,12 @@ app.delete('/anatomp/:_id', (req, res) => {
     Anatomp.findByIdAndRemove(req.params._id, (err, _anatomp) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({status: 200, data: _anatomp});
+        PecaFisica.remove({_id: {$in: _anatomp.pecasFisicas}}, err => {
+            if (err) return res.status(500).send({status: 500, error: err});
+
+            return res.status(200).send({status: 200, data: _anatomp});
+        })       
+        
     })
 });
 
