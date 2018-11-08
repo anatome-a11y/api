@@ -14,7 +14,7 @@ var esquemaLocalizacao = new Schema({
     _id: String,
     pecaFisica: {type : String, ref: 'PecaFisica'},
     numero: String,
-    referenciaRelativa: [esquemaReferenciaRelativa]
+    referenciaRelativa: esquemaReferenciaRelativa
 }, {_id: false});
 
 var esquemaMap = new Schema({
