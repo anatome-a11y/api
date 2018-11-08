@@ -5,14 +5,9 @@ var esquemaGeneralidade = require('../schemas/generalidade')
 
 var esquemaReferenciaRelativa = new Schema({
     _id: String,
-    anterior: String,
-    posterior: String,
-    latDir: String,
-    latEsq: String,
-    medDir: String,
-    medEsq: String,
-    superior: String,
-    inferior: String,    
+    referenciaParaReferenciado: String,
+    referenciadoParaReferencia: String,
+    referencia: { type: String, ref: 'Parte' }
 }, {_id: false});
 
 var esquemaLocalizacao = new Schema({
