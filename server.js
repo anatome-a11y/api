@@ -212,6 +212,7 @@ app.get('/anatomp', (req, res) => {
     .populate({path: 'pecasFisicas'})    
     .populate({ path: 'mapa.parte' })
     .populate({ path: 'mapa.localizacao.pecaFisica' })
+    .populate({ path: 'mapa.localizacao.referenciaRelativa.referencia' })
     .lean()
     .exec((err, anatomps) => {
         if (err) return res.status(500).send({status: 500, error: err});
