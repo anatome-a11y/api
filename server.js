@@ -232,7 +232,7 @@ app.get('/anatomp', (req, res) => {
                 let pecasAnatomp = {};
 
                 pecas.forEach(peca => {
-                    anatomp.partes.forEach(parteAnatomp => {
+                    anatomp.roteiro.partes.forEach(parteAnatomp => {
                         peca.partes.forEach(partePeca => {
                             if(partePeca._id == parteAnatomp._id && !pecasAnatomp.hasOwnProperty(peca._id)){
                                 pecasAnatomp[peca._id] = peca;
@@ -241,7 +241,7 @@ app.get('/anatomp', (req, res) => {
                     })
                 })
 
-                return {...anatomp, pecasGenericas: Object.values(pecasAnatomp)}
+                return {...anatomp, roteiro: {...anatomp.roteiro, pecasGenericas: Object.values(pecasAnatomp)}}
             })           
     
             return res.status(200).send({status: 200, data});
