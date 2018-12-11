@@ -158,7 +158,9 @@ app.put('/peca/:id', (req, res) => {
 
 //ROTEIRO
 app.get('/roteiro', (req, res) => {
-    Roteiro.find({}).populate({ path: 'conteudos', populate: {path: 'partes'} }).populate({path: 'partes'}).lean().exec((err, roteiros) => {
+    Roteiro.find({})
+    .populate({ path: 'conteudos', populate: {path: 'partes'} })
+    .populate({path: 'partes'}).lean().exec((err, roteiros) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
         const _roteiros = roteiros.map(withResumoMidias);
@@ -217,12 +219,33 @@ app.get('/anatomp', (req, res) => {
     .exec((err, anatomps) => {
         if (err) return res.status(500).send({status: 500, error: err});
 
-        const _anatomps = anatomps.map(a => ({
+        let _anatomps = anatomps.map(a => ({
             ...a,
             roteiro: withResumoMidias(a.roteiro)
         }))
 
-        return res.status(200).send({status: 200, data: _anatomps});
+        Peca.find({}).populate({path: 'partes'}).exec((err, pecas) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+
+
+            const data = _anatomps.map(anatomp => {
+                let pecasAnatomp = {};
+
+                pecas.forEach(peca => {
+                    anatomp.partes.forEach(parteAnatomp => {
+                        peca.partes.forEach(partePeca => {
+                            if(partePeca._id == parteAnatomp._id && !pecasAnatomp.hasOwnProperty(peca._id)){
+                                pecasAnatomp[peca._id] = peca;
+                            }
+                        })                        
+                    })
+                })
+
+                return {...anatomp, pecasGenericas: Object.values(pecasAnatomp)}
+            })           
+    
+            return res.status(200).send({status: 200, data});
+        });        
     });  
 });
 
