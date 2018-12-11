@@ -224,10 +224,10 @@ app.get('/anatomp', (req, res) => {
             roteiro: withResumoMidias(a.roteiro)
         }))
 
-        Peca.find({}).populate({path: 'partes'}).exec((err, pecas) => {
+        Peca.find({}).populate({path: 'partes'}).lean().exec((err, pecas) => {
             if (err) return res.status(500).send({status: 500, error: err});
 
-
+            //Provisório: No futuro, salvar referencia de peça generica dentro de peça fisica
             const data = _anatomps.map(anatomp => {
                 let pecasAnatomp = {};
 
