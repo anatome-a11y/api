@@ -165,22 +165,28 @@ app.get('/roteiro', (req, res) => {
 
         const _roteiros = roteiros.map(withResumoMidias);
 
-        //Provisório: No futuro, salvar referencia de peça generica dentro de parte
-        const data = _roteiros.map(roteiro => {
-            let pecasAnatomp = {};
-            roteiro.partes.forEach(parteAnatomp => {
-                peca.partes.forEach(partePeca => {
-                    if(partePeca._id == parteAnatomp._id && !pecasAnatomp.hasOwnProperty(peca._id)){
-                        pecasAnatomp[peca._id] = peca;
-                    }
-                })                        
-            })
-            
-            return {...roteiro, pecasGenericas: Object.values(pecasAnatomp)}                        
-        })
-        
+        Peca.find({}).populate({path: 'partes'}).lean().exec((err, pecas) => {
+            if (err) return res.status(500).send({status: 500, error: err});
 
-        return res.status(200).send({status: 200, data});
+            //Provisório: No futuro, salvar referencia de peça generica dentro de parte
+            const data = _roteiros.map(roteiro => {
+                let pecasAnatomp = {};
+
+                pecas.forEach(peca => {
+                    roteiro.partes.forEach(parteAnatomp => {
+                        peca.partes.forEach(partePeca => {
+                            if(partePeca._id == parteAnatomp._id && !pecasAnatomp.hasOwnProperty(peca._id)){
+                                pecasAnatomp[peca._id] = peca;
+                            }
+                        })                        
+                    })
+                })
+
+                return {...roteiro, pecasGenericas: Object.values(pecasAnatomp)}
+            })       
+    
+            return res.status(200).send({status: 200, data});
+        });        
     });  
 });
 
