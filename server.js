@@ -7,12 +7,15 @@ const app = express();
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit: 50000}));
 
+//ENVIRONMENT
+require('dotenv').config()
+
 //BANCO DE DADOS
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://doc-marcia:1qa2ws3ed@ds121382.mlab.com:21382/doc_marcia')
+mongoose.connect(process.env.MONGO_DB)
 .then(() => {
     console.log("Conexão realizada com sucesso!");    
 }).catch(err => {
