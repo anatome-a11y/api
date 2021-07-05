@@ -17,11 +17,20 @@ var esquemaLocalizacao = new Schema({
     referenciaRelativa: esquemaReferenciaRelativa
 }, {_id: false});
 
+var esquemaPonto = new Schema({
+    _id: String,
+    label: { type: String },
+    parte: { type: String, ref: 'Parte' },
+    x: String,
+    y: String
+}, { _id: false });
+
 var esquemaMap = new Schema({
     _id: String,
-    parte: {type : String, ref: 'Parte'},
+    parte: { type: String, ref: 'Parte' },
     localizacao: [esquemaLocalizacao],
-}, {_id: false});
+    pontos: []
+}, { _id: false });
 
 var esquemaAnatomp = new Schema({
     _id: String,
@@ -30,7 +39,8 @@ var esquemaAnatomp = new Schema({
     instituicao: String,
     pecasFisicas: [{type: String, ref: 'PecaFisica'}],
     mapa: [esquemaMap],
-    generalidades: [esquemaGeneralidade]
+    generalidades: [esquemaGeneralidade],
+    tipoPecaMapeamento: String
 }, {_id: false});
 
 var Anatomp = mongoose.model('Anatomp', esquemaAnatomp);   
