@@ -15,7 +15,7 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect(process.env.MONGO_DB)
+mongoose.connect(process.env.MONGO_DB,{ useNewUrlParser: true } )
 .then(() => {
     console.log("Conexão realizada com sucesso!");    
 }).catch(err => {
@@ -26,6 +26,7 @@ mongoose.connect(process.env.MONGO_DB)
 const Peca = require('./models/peca');
 const Roteiro = require('./models/roteiro');
 const Anatomp = require('./models/anatomp');
+const AnatomAv = require('./models/anatomAv');
 const Parte = require('./models/parte');
 const ConteudoTeorico = require('./models/conteudoTeorico');
 const PecaFisica = require('./models/pecaFisica');
@@ -229,6 +230,25 @@ app.put('/roteiro/:_id', (req, res) => {
     })
 });
 
+//ANATOMAV
+app.post('/anatomAv', (req, res) => {
+    var anatomAv = req.body;
+    var pecasFisicas = req.body.pecasFisicas.map(c => new PecaFisica(c));
+
+    PecaFisica.collection.insert(pecasFisicas, (err, pecasFisicas) => {
+        if (err) return res.status(500).send({status: 500, error: err});
+
+        anatomAv.pecasFisicas = anatomAv.pecasFisicas.map(c => c._id)
+
+        const toSave = new AnatomAv(anatomAv)        
+
+        toSave.save((err, anatomAv) => {
+            if (err) return res.status(500).send({status: 500, error: err});
+    
+            return res.status(200).send({status: 200, data: anatomAv});
+        }); 
+    });    
+});
 
 //AN@TOMP
 app.get('/anatomp', (req, res) => {
