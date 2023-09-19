@@ -6,9 +6,13 @@ const ConteudoTeorico = require('../models/conteudoTeorico');
 class PecaService {
     
   async findAll(req, res) {
+    console.info("findAll pecas")
     Peca.find({}).populate({ path: 'conteudoTeorico', populate: { path: 'partes'} }).populate({path: 'partes'}).exec((err, pecas) => {
-        if (err) return res.status(500).send({status: 500, error: err});
-
+        if (err) {
+            console.error(err)
+            return res.status(500).send({status: 500, error: err});
+        }
+        console.info(pecas)
         return res.status(200).send({status: 200, data: pecas});
     });  
   }
