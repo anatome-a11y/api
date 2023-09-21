@@ -2,8 +2,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const routes = require('./routes')
+const cors = require('cors');
 
 const app = express();
+
+// Configurar o middleware CORS para aceitar chamadas de qualquer origem
+app.use(cors());
 
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit: 50000}));
@@ -24,6 +28,7 @@ mongoose.connect(process.env.MONGO_DB)
     process.exit();
 });
 
+// Utiliza arquivos com as rotas mapeadas
 app.use(routes);
 
 //Tentativa de evitar 304
