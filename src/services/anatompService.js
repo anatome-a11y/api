@@ -9,6 +9,7 @@ const withResumoMidias = require('../utils/midiaUtils')
 class AnatompService {
 
     async findAll(req, res) {
+        console.info("findAll anatomp")
         Anatomp.find({})
         .populate({path: 'roteiro', populate: [{path: 'conteudos', populate: {path: 'partes'}}, {path: 'partes'}]})
         .populate({path: 'pecasFisicas'})    

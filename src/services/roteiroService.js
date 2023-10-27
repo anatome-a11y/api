@@ -6,6 +6,8 @@ const withResumoMidias = require('../utils/midiaUtils')
 class RoteiroService {
 
     async findall(req, res) {
+        console.info("findAll roteiros")
+
         Roteiro.find({})
         .populate({ path: 'conteudos', populate: {path: 'partes'} })
         .populate({path: 'partes'}).lean().exec((err, roteiros) => {
