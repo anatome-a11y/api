@@ -4,6 +4,8 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const { getBucket, salvarNoMongo } = require('./utils/arquivoMidia');
+const { registrarErro, registrarInfo, detalheDe } = require('./utils/log');
+const mongoose = require('mongoose');
 const routes = express.Router();
 
 const uploadsDir = path.resolve(__dirname, '../uploads');
@@ -32,22 +34,34 @@ const upload = multer({
 routes.post('/midia', (req, res, next) => {
     upload.single('file')(req, res, error => {
         if (error) {
+            registrarErro('POST /midia upload', error, { codigo: error.code });
             if (error.code === 'LIMIT_FILE_SIZE') {
                 return res.status(413).send({ status: 413, error: 'O arquivo excede o limite de 200 MB.' });
             }
-            return res.status(400).send({ status: 400, error: 'Arquivo ausente ou formato não suportado.' });
+            return res.status(400).send({ status: 400, error: 'Arquivo ausente ou formato não suportado.', detalhe: detalheDe(error) });
         }
         return next();
     });
 }, (req, res) => {
     if (!req.file) {
+        registrarInfo('POST /midia recusado', { motivo: 'arquivo ausente ou extensão não permitida' });
         return res.status(400).send({ status: 400, error: 'Arquivo ausente ou formato não suportado.' });
     }
+
+    const arquivo = {
+        nome: req.file.filename,
+        original: req.file.originalname,
+        tipo: req.file.mimetype,
+        bytes: req.file.size,
+        mongo: mongoose.connection.readyState
+    };
+    registrarInfo('POST /midia recebido', arquivo);
 
     salvarNoMongo(req.file)
         .then(() => {
             fs.unlink(req.file.path, () => {});
             const url = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
+            registrarInfo('POST /midia armazenado', { ...arquivo, url });
             return res.status(201).send({
                 status: 201,
                 data: {
@@ -58,9 +72,14 @@ routes.post('/midia', (req, res, next) => {
                 }
             });
         })
-        .catch(() => {
+        .catch(error => {
             fs.unlink(req.file.path, () => {});
-            return res.status(500).send({ status: 500, error: 'Não foi possível armazenar o arquivo.' });
+            registrarErro('POST /midia armazenamento', error, arquivo);
+            return res.status(500).send({
+                status: 500,
+                error: 'Não foi possível armazenar o arquivo.',
+                detalhe: detalheDe(error)
+            });
         });
 });
 
@@ -69,11 +88,17 @@ routes.get('/uploads/:filename', (req, res) => {
     try {
         bucket = getBucket();
     } catch (error) {
-        return res.status(503).send({ status: 503, error: 'Banco de dados indisponível' });
+        registrarErro('GET /uploads', error, { nome: req.params.filename });
+        return res.status(503).send({ status: 503, error: 'Banco de dados indisponível', detalhe: detalheDe(error) });
     }
 
     bucket.find({ filename: req.params.filename }).toArray((err, files) => {
-        if (err || !files || files.length === 0) {
+        if (err) {
+            registrarErro('GET /uploads consulta', err, { nome: req.params.filename });
+            return res.status(500).send({ status: 500, error: 'Não foi possível ler o arquivo.', detalhe: detalheDe(err) });
+        }
+        if (!files || files.length === 0) {
+            registrarInfo('GET /uploads ausente', { nome: req.params.filename });
             return res.status(404).send({ status: 404, error: 'Arquivo não encontrado' });
         }
 
@@ -83,7 +108,8 @@ routes.get('/uploads/:filename', (req, res) => {
         res.set('Cache-Control', 'public, max-age=31536000');
 
         const download = bucket.openDownloadStreamByName(req.params.filename);
-        download.on('error', () => {
+        download.on('error', error => {
+            registrarErro('GET /uploads download', error, { nome: req.params.filename });
             if (!res.headersSent) {
                 res.status(404).end();
             } else {

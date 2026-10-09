@@ -28,13 +28,21 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
+const { registrarErro, registrarInfo, detalheDe } = require('./utils/log');
+
 mongoose.connect(process.env.MONGO_DB)
 .then(() => {
-    console.log("Conexão realizada com sucesso!");    
+    registrarInfo('mongodb', { estado: 'conectado', readyState: mongoose.connection.readyState });
 }).catch(err => {
-    console.log('Não foi possível conectar ao banco de dados' + err);
+    registrarErro('mongodb conexao', err);
     process.exit();
 });
+
+mongoose.connection.on('error', err => registrarErro('mongodb', err));
+mongoose.connection.on('disconnected', () => registrarErro('mongodb', new Error('desconectado')));
+
+process.on('unhandledRejection', err => registrarErro('unhandledRejection', err));
+process.on('uncaughtException', err => registrarErro('uncaughtException', err));
 
 // Utiliza arquivos com as rotas mapeadas
 app.use(routes);
@@ -50,6 +58,14 @@ app.use(function(req, res, next) {
     next();
 });
 
+app.use((err, req, res, next) => {
+    registrarErro(`${req.method} ${req.path}`, err);
+    if (res.headersSent) {
+        return next(err);
+    }
+    return res.status(500).send({ status: 500, error: 'Erro interno', detalhe: detalheDe(err) });
+});
+
 app.listen(process.env.PORT || 8080, () => {
-    console.log("Ouvindo na porta 8080");
+    registrarInfo('servidor', { porta: process.env.PORT || 8080 });
 });
