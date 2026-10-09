@@ -3,14 +3,20 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const routes = require('./routes')
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
+
+const uploadsDir = path.resolve(__dirname, '../uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
 
 // Configurar o middleware CORS para aceitar chamadas de qualquer origem
 app.use(cors());
 
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit: 50000}));
+app.use('/uploads', express.static(uploadsDir));
 
 //ENVIRONMENT
 require('dotenv').config()
