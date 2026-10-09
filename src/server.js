@@ -7,6 +7,8 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
+// O Render encerra o HTTPS no proxy. Sem isso, req.protocol fica "http".
+app.set('trust proxy', 1);
 
 const uploadsDir = path.resolve(__dirname, '../uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
