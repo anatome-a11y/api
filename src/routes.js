@@ -2,10 +2,17 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
+const fs = require('fs');
+const { getBucket, salvarNoMongo } = require('./utils/arquivoMidia');
 const routes = express.Router();
 
 const uploadsDir = path.resolve(__dirname, '../uploads');
-const allowedExtensions = new Set(['png', 'jpg', 'jpeg', 'glb', 'gltf', 'obj']);
+const allowedExtensions = new Set([
+    'png', 'jpg', 'jpeg', 'gif', 'webp',
+    'glb', 'gltf', 'obj', 'mtl',
+    'mp3', 'wav', 'ogg', 'm4a', 'mp4', 'webm',
+    'pdf', 'doc', 'docx', 'xls', 'xlsx'
+]);
 const storage = multer.diskStorage({
     destination: uploadsDir,
     filename: (req, file, callback) => {
@@ -37,15 +44,53 @@ routes.post('/midia', (req, res, next) => {
         return res.status(400).send({ status: 400, error: 'Arquivo ausente ou formato não suportado.' });
     }
 
-    const url = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
-    return res.status(201).send({
-        status: 201,
-        data: {
-            name: req.file.filename,
-            originalName: req.file.originalname,
-            type: req.file.mimetype,
-            url
+    salvarNoMongo(req.file)
+        .then(() => {
+            fs.unlink(req.file.path, () => {});
+            const url = `${req.protocol}://${req.get('host')}/uploads/${encodeURIComponent(req.file.filename)}`;
+            return res.status(201).send({
+                status: 201,
+                data: {
+                    name: req.file.filename,
+                    originalName: req.file.originalname,
+                    type: req.file.mimetype,
+                    url
+                }
+            });
+        })
+        .catch(() => {
+            fs.unlink(req.file.path, () => {});
+            return res.status(500).send({ status: 500, error: 'Não foi possível armazenar o arquivo.' });
+        });
+});
+
+routes.get('/uploads/:filename', (req, res) => {
+    let bucket;
+    try {
+        bucket = getBucket();
+    } catch (error) {
+        return res.status(503).send({ status: 503, error: 'Banco de dados indisponível' });
+    }
+
+    bucket.find({ filename: req.params.filename }).toArray((err, files) => {
+        if (err || !files || files.length === 0) {
+            return res.status(404).send({ status: 404, error: 'Arquivo não encontrado' });
         }
+
+        const arquivo = files[0];
+        res.set('Content-Type', arquivo.contentType || 'application/octet-stream');
+        res.set('Content-Length', arquivo.length);
+        res.set('Cache-Control', 'public, max-age=31536000');
+
+        const download = bucket.openDownloadStreamByName(req.params.filename);
+        download.on('error', () => {
+            if (!res.headersSent) {
+                res.status(404).end();
+            } else {
+                res.end();
+            }
+        });
+        download.pipe(res);
     });
 });
 
