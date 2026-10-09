@@ -18,19 +18,19 @@ app.use(cors());
 
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit: 50000}));
-app.use('/uploads', express.static(uploadsDir));
 
 //ENVIRONMENT
 require('dotenv').config()
 
 //BANCO DE DADOS
 const mongoose = require('mongoose');
+const { opcoesMongo } = require('./utils/arquivoMidia');
 
 mongoose.Promise = global.Promise;
 
 const { registrarErro, registrarInfo, detalheDe } = require('./utils/log');
 
-mongoose.connect(process.env.MONGO_DB)
+mongoose.connect(process.env.MONGO_DB, opcoesMongo)
 .then(() => {
     registrarInfo('mongodb', { estado: 'conectado', readyState: mongoose.connection.readyState });
 }).catch(err => {
@@ -39,7 +39,8 @@ mongoose.connect(process.env.MONGO_DB)
 });
 
 mongoose.connection.on('error', err => registrarErro('mongodb', err));
-mongoose.connection.on('disconnected', () => registrarErro('mongodb', new Error('desconectado')));
+mongoose.connection.on('disconnected', () => registrarInfo('mongodb', { estado: 'desconectado', readyState: mongoose.connection.readyState }));
+mongoose.connection.on('reconnected', () => registrarInfo('mongodb', { estado: 'reconectado', readyState: mongoose.connection.readyState }));
 
 process.on('unhandledRejection', err => registrarErro('unhandledRejection', err));
 process.on('uncaughtException', err => registrarErro('uncaughtException', err));

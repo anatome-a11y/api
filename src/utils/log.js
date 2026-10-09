@@ -11,14 +11,14 @@ const detalheDe = err => {
 const registrarErro = (contexto, err, extra = {}) => {
     const erro = err instanceof Error ? err : null;
     const registro = {
+        ...extra,
         nivel: 'error',
         em: new Date().toISOString(),
         contexto,
         mensagem: detalheDe(err),
         nome: erro && erro.name,
         codigo: err && err.code,
-        stack: erro && erro.stack ? redigir(erro.stack).split('\n').slice(0, 8).join('\n') : undefined,
-        ...extra
+        stack: erro && erro.stack ? redigir(erro.stack).split('\n').slice(0, 8).join('\n') : undefined
     };
     console.error(JSON.stringify(registro));
 };

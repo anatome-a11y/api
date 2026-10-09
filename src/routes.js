@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-const { getBucket, salvarNoMongo } = require('./utils/arquivoMidia');
+const { getBucket, salvarNoMongo, garantirConexao } = require('./utils/arquivoMidia');
 const { registrarErro, registrarInfo, detalheDe } = require('./utils/log');
 const mongoose = require('mongoose');
 const routes = express.Router();
@@ -49,7 +49,7 @@ routes.post('/midia', (req, res, next) => {
     }
 
     const arquivo = {
-        nome: req.file.filename,
+        arquivo: req.file.filename,
         original: req.file.originalname,
         tipo: req.file.mimetype,
         bytes: req.file.size,
@@ -84,40 +84,47 @@ routes.post('/midia', (req, res, next) => {
 });
 
 routes.get('/uploads/:filename', (req, res) => {
-    let bucket;
-    try {
-        bucket = getBucket();
-    } catch (error) {
-        registrarErro('GET /uploads', error, { nome: req.params.filename });
-        return res.status(503).send({ status: 503, error: 'Banco de dados indisponível', detalhe: detalheDe(error) });
+    const filename = path.basename(req.params.filename);
+    const noDisco = path.join(uploadsDir, filename);
+
+    if (fs.existsSync(noDisco)) {
+        return res.sendFile(noDisco);
     }
 
-    bucket.find({ filename: req.params.filename }).toArray((err, files) => {
-        if (err) {
-            registrarErro('GET /uploads consulta', err, { nome: req.params.filename });
-            return res.status(500).send({ status: 500, error: 'Não foi possível ler o arquivo.', detalhe: detalheDe(err) });
-        }
-        if (!files || files.length === 0) {
-            registrarInfo('GET /uploads ausente', { nome: req.params.filename });
-            return res.status(404).send({ status: 404, error: 'Arquivo não encontrado' });
-        }
-
-        const arquivo = files[0];
-        res.set('Content-Type', arquivo.contentType || 'application/octet-stream');
-        res.set('Content-Length', arquivo.length);
-        res.set('Cache-Control', 'public, max-age=31536000');
-
-        const download = bucket.openDownloadStreamByName(req.params.filename);
-        download.on('error', error => {
-            registrarErro('GET /uploads download', error, { nome: req.params.filename });
-            if (!res.headersSent) {
-                res.status(404).end();
-            } else {
-                res.end();
+    garantirConexao()
+        .then(() => getBucket())
+        .then(bucket => new Promise((resolve, reject) => {
+            bucket.find({ filename }).toArray((err, files) => {
+                if (err) reject(err);
+                else resolve({ bucket, files });
+            });
+        }))
+        .then(({ bucket, files }) => {
+            if (!files || files.length === 0) {
+                registrarInfo('GET /uploads ausente', { arquivo: filename, disco: false, gridfs: false });
+                return res.status(404).send({ status: 404, error: 'Arquivo não encontrado' });
             }
+
+            const arquivo = files[0];
+            res.set('Content-Type', arquivo.contentType || 'application/octet-stream');
+            res.set('Content-Length', arquivo.length);
+            res.set('Cache-Control', 'public, max-age=31536000');
+
+            const download = bucket.openDownloadStreamByName(filename);
+            download.on('error', error => {
+                registrarErro('GET /uploads download', error, { arquivo: filename });
+                if (!res.headersSent) {
+                    res.status(404).end();
+                } else {
+                    res.end();
+                }
+            });
+            download.pipe(res);
+        })
+        .catch(error => {
+            registrarErro('GET /uploads', error, { arquivo: filename, mongo: mongoose.connection.readyState });
+            return res.status(503).send({ status: 503, error: 'Banco de dados indisponível', detalhe: detalheDe(error) });
         });
-        download.pipe(res);
-    });
 });
 
 //PEÇA
