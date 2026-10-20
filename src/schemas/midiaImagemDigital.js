@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 // malha identifica a malha do arquivo. faces são os triângulos de uma área
-// fechada. traco é a curva desenhada, aberta ou em volta da área.
+// fechada. recorte é essa área já cortada no contorno. traco é a curva.
 // strict: false preserva campos antigos dos pontos já gravados.
 var esquemaPontoMidia = new Schema({
     x: Schema.Types.Mixed,
@@ -12,6 +12,7 @@ var esquemaPontoMidia = new Schema({
     parte: Schema.Types.Mixed,
     malha: String,
     faces: Schema.Types.Mixed,
+    recorte: Schema.Types.Mixed,
     traco: Schema.Types.Mixed,
 }, { _id: false, strict: false });
 
