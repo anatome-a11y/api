@@ -24,7 +24,7 @@ require('dotenv').config()
 
 //BANCO DE DADOS
 const mongoose = require('mongoose');
-const { opcoesMongo } = require('./utils/arquivoMidia');
+const { opcoesMongo, recompactarGrandes } = require('./utils/arquivoMidia');
 
 mongoose.Promise = global.Promise;
 
@@ -33,6 +33,7 @@ const { registrarErro, registrarInfo, detalheDe } = require('./utils/log');
 mongoose.connect(process.env.MONGO_DB, opcoesMongo)
 .then(() => {
     registrarInfo('mongodb', { estado: 'conectado', readyState: mongoose.connection.readyState });
+    recompactarGrandes();
 }).catch(err => {
     registrarErro('mongodb conexao', err);
     process.exit();
@@ -44,6 +45,11 @@ mongoose.connection.on('reconnected', () => registrarInfo('mongodb', { estado: '
 
 process.on('unhandledRejection', err => registrarErro('unhandledRejection', err));
 process.on('uncaughtException', err => registrarErro('uncaughtException', err));
+
+app.use('/vendor', express.static(path.resolve(__dirname, '../vendor'), {
+    maxAge: '365d',
+    immutable: true
+}));
 
 // Utiliza arquivos com as rotas mapeadas
 app.use(routes);
