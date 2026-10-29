@@ -11,6 +11,7 @@ var esquemaPontoMidia = new Schema({
     label: Schema.Types.Mixed,
     parte: Schema.Types.Mixed,
     malha: String,
+    malhas: [String],
     faces: Schema.Types.Mixed,
     recorte: Schema.Types.Mixed,
     traco: Schema.Types.Mixed,
