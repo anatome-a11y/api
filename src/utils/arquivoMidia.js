@@ -77,6 +77,30 @@ const apagarArquivo = (bucket, id) => new Promise((resolve, reject) => {
     bucket.delete(id, err => (err ? reject(err) : resolve()));
 });
 
+const listarPorNome = (bucket, filename) => new Promise((resolve, reject) => {
+    bucket.find({ filename }).toArray((err, arquivos) => {
+        if (err) reject(err);
+        else resolve(arquivos || []);
+    });
+});
+
+// Apaga o arquivo no GridFS só quando mais ninguém aponta para ele.
+// Um mesmo envio pode estar em outra peça; nesse caso o arquivo fica.
+const apagarArquivosLivres = (nomes, aindaUsado) => {
+    const lista = Array.from(nomes || []).filter(Boolean);
+    return lista.reduce((fila, nome) => fila.then(apagados => Promise.resolve()
+        .then(() => aindaUsado(nome))
+        .then(usado => {
+            if (usado) return apagados;
+            return garantirConexao().then(() => {
+                const bucket = getBucket();
+                return listarPorNome(bucket, nome).then(arquivos => arquivos.reduce((proxima, arquivo) => (
+                    proxima.then(total => apagarArquivo(bucket, arquivo._id).then(() => total + 1))
+                ), Promise.resolve(apagados)));
+            });
+        })), Promise.resolve(0));
+};
+
 const abortar = upload => {
     if (!upload || upload.state.aborted || upload.state.streamEnd) return;
     upload.abort(() => {});
@@ -232,5 +256,6 @@ module.exports = {
     getBucket,
     GridFsStorage,
     recompactarGrandes,
+    apagarArquivosLivres,
     CHUNK_SIZE
 };
